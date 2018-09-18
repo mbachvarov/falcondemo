@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.falcon.springboot.falcondemo.assembler.MessageResourceAssembler;
+import com.falcon.springboot.falcondemo.exception.InvalidInputDataException;
 import com.falcon.springboot.falcondemo.model.Message;
 import com.falcon.springboot.falcondemo.publisher.Publisher;
 import com.falcon.springboot.falcondemo.repository.MessageRepository;
+import com.falcon.springboot.falcondemo.util.JSONValidate;
 
 /*
  * Rest api controller for messages
@@ -32,10 +34,10 @@ public class MessageApiController {
 
 	@Autowired
 	MessageRepository messageRepository;
-	
+
 	@Autowired
 	MessageResourceAssembler assembler;
-	
+
 	/*
 	 * Returns all messages stored in the database
 	 */
@@ -43,6 +45,7 @@ public class MessageApiController {
 	public Resources<Resource<Message>> getAllMessages() {
 		final List<Resource<Message>> messages = messageRepository.findAll().stream().map(assembler::toResource)
 				.collect(Collectors.toList());
+		
 		return new Resources<>(messages, linkTo(methodOn(MessageApiController.class).getAllMessages()).withSelfRel());
 	}
 
@@ -51,16 +54,14 @@ public class MessageApiController {
 	 */
 	@PostMapping("/messages")
 	ResponseEntity<?> createMessage(@RequestBody String jsonString) throws URISyntaxException {
-		try {
-			new JSONObject(jsonString);
-			this.redisPublisher.publish(jsonString);
-
-			final Resource<String> resource = new Resource<>(jsonString,
-					linkTo(methodOn(MessageApiController.class).getAllMessages()).withSelfRel());
-			return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
-		}catch(JSONException ex) {
-			// return invalid input
-			return null;
+		if (!JSONValidate.isValid(jsonString)) {
+			throw new InvalidInputDataException(jsonString, "Json");
 		}
+		
+		this.redisPublisher.publish(jsonString);
+		final Resource<String> resource = new Resource<>(jsonString,
+				linkTo(methodOn(MessageApiController.class).getAllMessages()).withSelfRel());
+		
+		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 }
