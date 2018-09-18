@@ -1,0 +1,48 @@
+version: '3'
+services:
+  mysql:
+   container_name: mysql
+   image: mysql/mysql-server:5.7
+   environment:
+    MYSQL_ROOT_PASSWORD: AddnMofw2!9HfewIUL566b!d
+    MYSQL_DATABASE: falcon_demo_db
+    MYSQL_USER: falcon_demo_user
+    MYSQL_PASSWORD: Jdnw212!9HopL34bfd
+   ports:
+    - "3306:3306"
+   restart: always
+   networks:
+    - local
+    
+  redis:
+   container_name: redis
+   image: "redis:alpine"
+   command: ["redis-server", "--protected-mode", "no"]
+   hostname: redis
+   ports:
+    - "6379:6379"
+   restart: always
+   networks:
+    - local
+     
+  app:
+   restart: always
+   build: ./falcondemo
+   working_dir: /falcondemo
+   volumes:
+     - ./falcondemo:/falcondemo
+     - ~/.m2:/root/.m2
+   ports:
+     - "8080:8080"
+   command: mvn clean spring-boot:run
+   depends_on:
+     - mysql
+     - redis
+   networks:
+    - local
+   
+networks:
+  local:
+    driver: bridge
+    
+      
