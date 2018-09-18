@@ -33,7 +33,8 @@ public class RedisConfig {
 
 	@Bean
 	JedisConnectionFactory jedisConnectionFactory() {
-		final RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHostName, redisPort);
+		final RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(
+				redisHostName, redisPort);
 		return new JedisConnectionFactory(redisStandaloneConfiguration);
 	}
 

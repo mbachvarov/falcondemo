@@ -5,6 +5,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,10 +41,10 @@ public class MessageApiController {
 
 	@Autowired
 	MessageResourceAssembler assembler;
-	
+
 	@Autowired
 	WebSocketService websocketService;
-	
+
 	/*
 	 * Returns all messages stored in the database
 	 */
@@ -51,7 +52,7 @@ public class MessageApiController {
 	public Resources<Resource<Message>> getAllMessages() {
 		final List<Resource<Message>> messages = messageRepository.findAll().stream().map(assembler::toResource)
 				.collect(Collectors.toList());
-		
+
 		return new Resources<>(messages, linkTo(methodOn(MessageApiController.class).getAllMessages()).withSelfRel());
 	}
 
@@ -63,17 +64,17 @@ public class MessageApiController {
 		if (!JSONValidate.isValid(messageJsonString)) {
 			throw new InvalidInputDataException(messageJsonString, "Json");
 		}
-		
+
 		// publishing in redis
 		this.redisPublisher.publish(messageJsonString);
-	
+
 		// pushing through websocket for listening browser clients
 		this.websocketService.broadcast(messageJsonString);
-		
+
 		// generating returned resource object
 		final Resource<String> resource = new Resource<>(messageJsonString,
 				linkTo(methodOn(MessageApiController.class).getAllMessages()).withSelfRel());
-		
+
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 }

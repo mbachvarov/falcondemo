@@ -5,6 +5,7 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 
 import com.falcon.springboot.falcondemo.repository.MessageRepository;
+
 /*
  * This class is responsible for handling redis messages
  */

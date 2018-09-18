@@ -2,6 +2,7 @@ package com.falcon.springboot.falcondemo.model;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
@@ -15,10 +16,11 @@ public class Message implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 9134960173743134442L;
-	
+
 	public Message() {
-		
+
 	}
+
 	public Message(String content) {
 		this.content = content;
 	}

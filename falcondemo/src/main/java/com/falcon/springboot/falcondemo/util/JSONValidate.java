@@ -5,10 +5,10 @@ import org.json.JSONObject;
 
 public class JSONValidate {
 	public static boolean isValid(String jsonString) {
-		try{
+		try {
 			new JSONObject(jsonString);
 			return true;
-		}catch(JSONException e) {
+		} catch (JSONException e) {
 			return false;
 		}
 	}
