@@ -21,6 +21,7 @@ import com.falcon.springboot.falcondemo.exception.InvalidInputDataException;
 import com.falcon.springboot.falcondemo.model.Message;
 import com.falcon.springboot.falcondemo.publisher.Publisher;
 import com.falcon.springboot.falcondemo.repository.MessageRepository;
+import com.falcon.springboot.falcondemo.service.WebSocketService;
 import com.falcon.springboot.falcondemo.util.JSONValidate;
 
 /*
@@ -35,7 +36,10 @@ public class MessageApiController {
 
 	@Autowired
 	MessageResourceAssembler assembler;
-
+	
+	@Autowired
+	WebSocketService websocketService;
+	
 	/*
 	 * Returns all messages stored in the database
 	 */
@@ -51,13 +55,19 @@ public class MessageApiController {
 	 * Receives json messge and pushes it in redis
 	 */
 	@PostMapping("/messages")
-	ResponseEntity<?> createMessage(@RequestBody String jsonString) throws URISyntaxException {
-		if (!JSONValidate.isValid(jsonString)) {
-			throw new InvalidInputDataException(jsonString, "Json");
+	ResponseEntity<?> createMessage(@RequestBody String messageJsonString) throws URISyntaxException {
+		if (!JSONValidate.isValid(messageJsonString)) {
+			throw new InvalidInputDataException(messageJsonString, "Json");
 		}
 		
-		this.redisPublisher.publish(jsonString);
-		final Resource<String> resource = new Resource<>(jsonString,
+		// publishing in redis
+		this.redisPublisher.publish(messageJsonString);
+	
+		// pushing through websocket for listening browser clients
+		this.websocketService.broadcast(messageJsonString);
+		
+		// generating returned resource object
+		final Resource<String> resource = new Resource<>(messageJsonString,
 				linkTo(methodOn(MessageApiController.class).getAllMessages()).withSelfRel());
 		
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
