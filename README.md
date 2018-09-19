@@ -17,14 +17,14 @@ The application is developed in Java 8 using:
     <li>Spring WebSockets implementation</li>
 </ul>
 
---SET UP--<br>
+**--SET UP--**<br>
 The project contains docker-compose.yaml file.<br>
 This makes building, testing and then runnig the application easy.<br>
 Get started by running the following command:<br>
-    **docker-compose up**
+**docker-compose up**
  > *Docker must be installed before running the command
 
---BASIC DESCRIPTION--<br>
+**--BASIC DESCRIPTION--**<br>
 
 URL | METHOD | DESCRIPTION
 --- | --- | ---
@@ -32,9 +32,9 @@ http://<docker-host>:8080/api/messages | GET | Returns all existing messages
 http://<docker-host>:8080/api/messages | POST | Takes JSON input data and creates new message
 http://<docker-host>:8080/messages/live | GET | Returns a simple HTML page for live monitoring of the received messages
  
---DOCUMENTATION---
+**--DOCUMENTATION--**
 ```sh
-After runnig the application, full documentatino cn be found at:
-http://<docker-host>:8080/swagger-ui.html _UI version
+After runnig the application, full documentation can be found at:
+http://<docker-host>:8080/swagger-ui.html  UI version
 http://<docker-host>:8080/v2/api-docs      JSON version
 ```
