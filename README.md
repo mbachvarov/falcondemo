@@ -6,9 +6,9 @@ Application summary:
    <li>A REST endpoint is implemented for retrieving all the messages persisted in JSON format from the database</li>
    <li>The message is also pushed through Websockets for listening browser clients at the time the message was received on the REST endpoint</li>
    <li>A simple HTML page is implemented to show the real time message delivery</li>
-<li>
-<br>
-Application developed in Java 8 using:
+</ul>
+
+The application is developed in Java 8 using:
 <ul>
     <li>Spring Boot</li>
     <li>Maven</li>
