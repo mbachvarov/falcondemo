@@ -8,7 +8,7 @@ This makes building, testing and then runnig the application easy.
 Get started by running the following command:
     docker-compose up
 ```
---BASIC DESCRIPTION--
+
 URL | METHOD | DESCRIPTION
 --- | --- | ---
 http://<\<docker-host>\>:8080/api/messages | GET | Returns all existing messages
