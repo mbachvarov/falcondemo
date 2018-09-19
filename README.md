@@ -22,10 +22,11 @@ The application is developed in Java 8 using:
 The project contains docker-compose.yaml file.
 This makes building, testing and then runnig the application easy.
 Get started by running the following command:
-    <b>docker-compose up<b>
-*Docker must be installed before running the command.
+    **docker-compose up**
+*_Docker must be installed before running the command_
 ```
 --BASIC DESCRIPTION--<br>
+
 URL | METHOD | DESCRIPTION
 --- | --- | ---
 http://<docker-host>:8080/api/messages | GET | Returns all existing messages
