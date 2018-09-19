@@ -28,9 +28,9 @@ Get started by running the following command:<br>
 
 URL | METHOD | DESCRIPTION
 --- | --- | ---
-http://<docker-host>:8080/api/messages | GET | Returns all existing messages
-http://<docker-host>:8080/api/messages | POST | Takes JSON input data and creates new message
-http://<docker-host>:8080/messages/live | GET | Returns a simple HTML page for live monitoring of the received messages
+http://</docker-host/>:8080/api/messages | GET | Returns all existing messages
+http://</docker-host/>:8080/api/messages | POST | Takes JSON input data and creates new message
+http://</docker-host/>:8080/messages/live | GET | Returns a simple HTML page for live monitoring of the received messages
  
 **--DOCUMENTATION--**
 ```sh
