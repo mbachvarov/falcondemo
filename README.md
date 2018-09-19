@@ -1,13 +1,21 @@
 Simple data processing pipeline in the cloud.<br>
-Application devolped in Java 8 using Spring Boot, Maven, MySQL database, Redis(Pub/Sub), Spring WebSockets implementation.<br>
+Application devolped in Java 8 using:
+<ul>
+    <li>Spring Boot</li>
+    <li>Maven</li>
+    <li>MySQL</li>
+    <li>Redis(Pub/Sub)</li>
+    <li>Spring WebSockets implementation</li>
+</ul>
 
 --SET UP--
 ```sh
 The project contains docker-compose.yaml file. tha
 This makes building, testing and then runnig the application easy.
 Get started by running the following command:
-    docker-compose up
+    <b>docker-compose up<b>
 ```
+--BASIC DESCRIPTION--<br>
 
 URL | METHOD | DESCRIPTION
 --- | --- | ---
