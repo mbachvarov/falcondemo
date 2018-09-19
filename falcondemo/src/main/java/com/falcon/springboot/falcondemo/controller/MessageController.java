@@ -12,7 +12,7 @@ import io.swagger.annotations.ApiOperation;
 public class MessageController {
 	// Monitor live incomming messages
 	@GetMapping("/messages/live")
-	@ApiOperation("HTML page for live monitoring of the incomming messages.")
+	@ApiOperation("Returns a simple HTML page for live monitoring of the received messages.")
 	public String getMessagesLive(Model model) {
 		return "live_messages";
 	}
