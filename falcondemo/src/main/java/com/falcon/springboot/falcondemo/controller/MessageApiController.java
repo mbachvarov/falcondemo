@@ -27,11 +27,18 @@ import com.falcon.springboot.falcondemo.repository.MessageRepository;
 import com.falcon.springboot.falcondemo.service.WebSocketService;
 import com.falcon.springboot.falcondemo.util.JSONValidate;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
+
 /*
  * Rest api controller for messages
  */
 @RestController
 @RequestMapping("/api")
+@Api(tags = { "REST Message Api Controller" })
 public class MessageApiController {
 	@Autowired
 	private Publisher redisPublisher;
@@ -54,6 +61,7 @@ public class MessageApiController {
 
 	@RequestMapping(value = "/messages", produces = { "application/hal+json",
 			"application/json" }, method = RequestMethod.GET)
+	@ApiOperation("Returns all messages stored in the database.")
 	public Resources<Resource<Message>> getAllMessages() {
 		final List<Resource<Message>> messages = messageRepository.findAll().stream().map(assembler::toResource)
 				.collect(Collectors.toList());
@@ -64,18 +72,19 @@ public class MessageApiController {
 	/*
 	 * Receives json messge and pushes it in redis
 	 */
-	@PostMapping("messages")
-	ResponseEntity<?> createMessage(@RequestBody String messageJsonString) throws URISyntaxException {
+	@RequestMapping(value = "/messages", produces = { "application/hal+json",
+			"application/json" }, method = RequestMethod.POST)
+	@ApiOperation("Creates a new message.")
+	ResponseEntity<?> createMessage(
+			@ApiParam("JSON data for a new message to be created.") @RequestBody String messageJsonString)
+			throws URISyntaxException {
 		if (!JSONValidate.isValid(messageJsonString)) {
 			throw new InvalidInputDataException(messageJsonString, "Json");
 		}
-
 		// publishing in redis
 		this.redisPublisher.publish(defaultTopic, messageJsonString);
-
 		// pushing through websocket for listening browser clients
 		this.websocketService.broadcast(messageJsonString);
-
 		// generating returned resource object
 		final Resource<String> resource = new Resource<>(messageJsonString,
 				linkTo(methodOn(MessageApiController.class).getAllMessages()).withSelfRel());
