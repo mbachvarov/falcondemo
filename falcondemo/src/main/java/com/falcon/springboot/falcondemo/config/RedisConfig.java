@@ -31,6 +31,9 @@ public class RedisConfig {
 	@Value("${spring.redis.port}")
 	private int redisPort;
 
+	/*
+	 * Redis connection bean
+	 */
 	@Bean
 	JedisConnectionFactory jedisConnectionFactory() {
 		final RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(
@@ -38,6 +41,9 @@ public class RedisConfig {
 		return new JedisConnectionFactory(redisStandaloneConfiguration);
 	}
 
+	/*
+	 * Redis template bean for pushing messages in channel
+	 */
 	@Bean
 	public RedisTemplate<String, Object> redisTemplate() {
 		final RedisTemplate<String, Object> template = new RedisTemplate<String, Object>();
@@ -46,30 +52,52 @@ public class RedisConfig {
 		return template;
 	}
 
+	/*
+	 * Redis message listener adapter bean
+	 */
 	@Bean
 	MessageListenerAdapter messageListener(MessageRepository messageRepository) {
-		return new MessageListenerAdapter(new RedisConsumer(messageRepository));
+		return new MessageListenerAdapter(redisConsumer(messageRepository));
 	}
 
+	/*
+	 * Redis container bean for default topic message listener
+	 */
 	@Bean
-	RedisMessageListenerContainer redisContainer(MessageRepository messageRepository) {
+	RedisMessageListenerContainer redisContainer(MessageRepository messageRepository, ChannelTopic defaultTopic) {
 		final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
 		container.setConnectionFactory(jedisConnectionFactory());
-		container.addMessageListener(messageListener(messageRepository), topic());
+		container.addMessageListener(messageListener(messageRepository), defaultTopic);
 		return container;
 	}
 
+	/*
+	 * Redis publisher bean
+	 */
 	@Bean
 	Publisher redisPublisher() {
-		return new RedisPublisher(redisTemplate(), topic());
+		return new RedisPublisher();
 	}
 
+	/*
+	 * Redis consumer bean
+	 */
 	@Bean
-	ChannelTopic topic() {
+	RedisConsumer redisConsumer(MessageRepository messageRepository) {
+		return new RedisConsumer(messageRepository);
+	}
+
+	/*
+	 * Default channel topic bean
+	 */
+	@Bean
+	ChannelTopic defaultTopic() {
 		return new ChannelTopic("pubsub:messages-channel");
 	}
 
-	// To resolve ${} in @Value
+	/*
+	 * To resolve ${} in @Value
+	 */
 	@Bean
 	public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
 		return new PropertySourcesPlaceholderConfigurer();

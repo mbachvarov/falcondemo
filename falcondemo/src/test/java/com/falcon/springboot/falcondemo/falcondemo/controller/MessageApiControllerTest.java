@@ -1,19 +1,22 @@
 package com.falcon.springboot.falcondemo.falcondemo.controller;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.mockito.Mockito;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -46,6 +49,9 @@ public class MessageApiControllerTest {
 	@MockBean
 	private MessageResourceAssembler assembler;
 
+	@MockBean
+	private ChannelTopic defaultTopic;
+
 	private Message mockMessage = new Message("test message");
 
 	/*
@@ -75,12 +81,12 @@ public class MessageApiControllerTest {
 	@Test
 	public void createMessageResponseStatusBadRequest() throws Exception {
 		String testMessage = "test message invalid json";
-		Mockito.doNothing().when(redisPublisher).publish(testMessage);
+		Mockito.doNothing().when(redisPublisher).publish(defaultTopic, testMessage);
 		Mockito.doNothing().when(websocketService).broadcast(testMessage);
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/messages").content(testMessage);
 		mockMvc.perform(requestBuilder).andExpect(status().isBadRequest());
-		Mockito.verify(redisPublisher, Mockito.times(0)).publish(testMessage);
+		Mockito.verify(redisPublisher, Mockito.times(0)).publish(defaultTopic, testMessage);
 		Mockito.verify(websocketService, Mockito.times(0)).broadcast(testMessage);
 	}
 
@@ -93,7 +99,7 @@ public class MessageApiControllerTest {
 	public void createMessage() throws Exception {
 		String testMessage = "{\"content\":\"test contetn\"}";
 
-		Mockito.doNothing().when(redisPublisher).publish(testMessage);
+		Mockito.doNothing().when(redisPublisher).publish(defaultTopic, testMessage);
 		Mockito.doNothing().when(websocketService).broadcast(testMessage);
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/messages").content(testMessage);
@@ -101,8 +107,8 @@ public class MessageApiControllerTest {
 				.andExpect(content().contentType(MediaType.parseMediaType("application/hal+json;charset=UTF-8")))
 				.andExpect(jsonPath("$.content", is(testMessage)));
 
-		Mockito.verify(redisPublisher, Mockito.times(1)).publish(testMessage);
-		Mockito.verify(redisPublisher).publish(testMessage);
+		Mockito.verify(redisPublisher, Mockito.times(1)).publish(defaultTopic, testMessage);
+		Mockito.verify(redisPublisher).publish(defaultTopic, testMessage);
 		Mockito.verify(websocketService, Mockito.times(1)).broadcast(testMessage);
 		Mockito.verify(websocketService).broadcast(testMessage);
 	}

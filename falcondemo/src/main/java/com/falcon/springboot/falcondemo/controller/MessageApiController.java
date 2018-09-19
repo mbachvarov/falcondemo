@@ -5,18 +5,18 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.falcon.springboot.falcondemo.assembler.MessageResourceAssembler;
@@ -37,18 +37,23 @@ public class MessageApiController {
 	private Publisher redisPublisher;
 
 	@Autowired
-	MessageRepository messageRepository;
+	private MessageRepository messageRepository;
 
 	@Autowired
-	MessageResourceAssembler assembler;
+	private MessageResourceAssembler assembler;
 
 	@Autowired
-	WebSocketService websocketService;
+	private WebSocketService websocketService;
+
+	@Autowired
+	private ChannelTopic defaultTopic;
 
 	/*
 	 * Returns all messages stored in the database
 	 */
-	@GetMapping("messages")
+
+	@RequestMapping(value = "/messages", produces = { "application/hal+json",
+			"application/json" }, method = RequestMethod.GET)
 	public Resources<Resource<Message>> getAllMessages() {
 		final List<Resource<Message>> messages = messageRepository.findAll().stream().map(assembler::toResource)
 				.collect(Collectors.toList());
@@ -59,14 +64,14 @@ public class MessageApiController {
 	/*
 	 * Receives json messge and pushes it in redis
 	 */
-	@PostMapping("/messages")
+	@PostMapping("messages")
 	ResponseEntity<?> createMessage(@RequestBody String messageJsonString) throws URISyntaxException {
 		if (!JSONValidate.isValid(messageJsonString)) {
 			throw new InvalidInputDataException(messageJsonString, "Json");
 		}
 
 		// publishing in redis
-		this.redisPublisher.publish(messageJsonString);
+		this.redisPublisher.publish(defaultTopic, messageJsonString);
 
 		// pushing through websocket for listening browser clients
 		this.websocketService.broadcast(messageJsonString);

@@ -11,19 +11,8 @@ public class RedisPublisher implements Publisher {
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
 
-	@Autowired
-	private ChannelTopic topic;
-
-	public RedisPublisher() {
-	}
-
-	public RedisPublisher(RedisTemplate<String, Object> redisTemplate, ChannelTopic topic) {
-		this.redisTemplate = redisTemplate;
-		this.topic = topic;
-	}
-
 	@Override
-	public void publish(String message) {
+	public void publish(ChannelTopic topic, String message) {
 		redisTemplate.convertAndSend(topic.getTopic(), message);
 	}
 }
