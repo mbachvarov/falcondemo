@@ -17,14 +17,13 @@ The application is developed in Java 8 using:
     <li>Spring WebSockets implementation</li>
 </ul>
 
---SET UP--
-```sh
-The project contains docker-compose.yaml file.
-This makes building, testing and then runnig the application easy.
-Get started by running the following command:
+--SET UP--<br>
+The project contains docker-compose.yaml file.<br>
+This makes building, testing and then runnig the application easy.<br>
+Get started by running the following command:<br>
     **docker-compose up**
-*_Docker must be installed before running the command_
-```
+ > *Docker must be installed before running the command
+
 --BASIC DESCRIPTION--<br>
 
 URL | METHOD | DESCRIPTION
